@@ -29,7 +29,7 @@ class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate (SQLiteDatabase database){
         String table = "CREATE TABLE " + DATABASE_TABLE + "("
-                + KEY_FIELD_ID + " INTEGER PRIMARY KEY, "
+                + KEY_FIELD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + FIELD_DESCRIPTION + " TEXT, "
                 + FIELD_IS_DONE + " INTEGER" + ")";
         database.execSQL (table);
@@ -51,7 +51,7 @@ class DBHelper extends SQLiteOpenHelper {
 
         // Step 2) Make a key-value pair for each value you want to insert
         ContentValues values = new ContentValues();
-        values.put(KEY_FIELD_ID, newTask.getId());
+        //values.put(KEY_FIELD_ID, newTask.getId());
         values.put(FIELD_DESCRIPTION, newTask.getDescription());
         values.put(FIELD_IS_DONE, newTask.getIsDone());
 
@@ -72,7 +72,7 @@ class DBHelper extends SQLiteOpenHelper {
         ArrayList<Task> allTasks = new ArrayList<>();
 
         // Step 3) Query the database for all record (all rows) and all fields (all columns)
-        // The return type of a querey is a Cursor
+        // The return type of a query is a Cursor
         Cursor results = db.query(DATABASE_TABLE, null, null, null, null, null, null);
 
         // Step 4) Loop through the results, create Task objects, add to the array list
@@ -90,5 +90,34 @@ class DBHelper extends SQLiteOpenHelper {
 
         db.close();
         return allTasks;
+    }
+
+
+    public void updateTask(Task existingTask)
+    {
+        // Step 1) Create a reference to our database
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Step 2) Make a key-value pair for each value you want to insert
+        ContentValues values = new ContentValues();
+        //values.put(KEY_FIELD_ID, newTask.getId());
+        values.put(FIELD_DESCRIPTION, existingTask.getDescription());
+        values.put(FIELD_IS_DONE, existingTask.getIsDone());
+
+        // Step 3)
+        db.update(DATABASE_TABLE,
+                values,
+                KEY_FIELD_ID + "=?",
+                new String[] {String.valueOf(existingTask.getId())});
+
+        // Step 4) CLOSE the database
+        db.close();
+    }
+
+    public void deleteAllTasks()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(DATABASE_TABLE, null, null);
+        db.close();
     }
 }
